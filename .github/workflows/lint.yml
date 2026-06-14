@@ -1,0 +1,29 @@
+name: lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+
+      - name: shellcheck
+        run: shellcheck scripts/*.sh
+
+      # actionlint via `go install` (Go is preinstalled on the runner); the module proxy verifies the
+      # pinned version against the Go checksum database, so no third-party action and no curl-to-bash.
+      - name: actionlint
+        run: |
+          go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.10
+          "$(go env GOPATH)/bin/actionlint" -color
+
+      - name: python syntax
+        run: python3 -m py_compile tools/mock_github_mcp.py
