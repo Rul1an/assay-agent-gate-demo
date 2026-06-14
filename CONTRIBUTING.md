@@ -6,13 +6,12 @@ best contributions keep it that way.
 
 ## Run it locally
 
-You need `python3` and an `assay-mcp-server` binary. The `enforcement-sarif` projector is newer than
-the latest tagged assay release, so for now build it from assay main:
+You need `python3` and `assay-mcp-server` 3.26.0 or newer (the version that ships the
+`enforcement-sarif` projector):
 
 ```bash
-git clone --depth 1 https://github.com/Rul1an/assay
-cargo build --release --locked -p assay-mcp-server --manifest-path assay/Cargo.toml
-ASSAY=assay/target/release/assay-mcp-server ./scripts/run-gate.sh
+cargo install assay-mcp-server          # or download a binary from https://github.com/Rul1an/assay/releases
+./scripts/run-gate.sh
 ```
 
 The gate runs each action in `agent/actions.jsonl` through the enforcing proxy against the approved
