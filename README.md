@@ -26,11 +26,9 @@ red vs green contrast is visible in the PR checks and the Security tab.
 ## Run it locally (offline)
 
 ```bash
-# needs python3 and an assay-mcp-server with `enforcement-sarif` (newer than the latest release),
-# so build it from assay main:
-git clone --depth 1 https://github.com/Rul1an/assay
-cargo build --release --locked -p assay-mcp-server --manifest-path assay/Cargo.toml
-ASSAY=assay/target/release/assay-mcp-server ./scripts/run-gate.sh
+# needs python3 and assay-mcp-server 3.26.0+ (the version with the enforcement-sarif projector):
+cargo install assay-mcp-server          # or download a binary from https://github.com/Rul1an/assay/releases
+./scripts/run-gate.sh
 ```
 
 The gate runs each action in `agent/actions.jsonl` through the enforcing proxy against the approved

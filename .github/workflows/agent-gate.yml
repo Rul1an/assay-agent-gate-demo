@@ -15,33 +15,31 @@ concurrency:
   group: agent-gate-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  # Pinned for a deterministic demo; bump when you want a newer assay. enforcement-sarif ships
+  # from v3.26.0 onward.
+  ASSAY_VERSION: v3.26.0
+
 jobs:
   gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - name: Check out the demo
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
-      # The enforcement-sarif projector is newer than the latest tagged assay release, so build
-      # assay-mcp-server from assay main. Swatinem/rust-cache keeps later runs fast.
-      - name: Check out assay
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          repository: Rul1an/assay
-          ref: main
-          path: assay-src
-
-      - name: Cache the Rust build
-        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
-        with:
-          workspaces: assay-src
-
-      - name: Build assay-mcp-server
-        working-directory: assay-src
+      - name: Install assay-mcp-server
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          cargo build --release --locked -p assay-mcp-server
-          echo "ASSAY=$GITHUB_WORKSPACE/assay-src/target/release/assay-mcp-server" >> "$GITHUB_ENV"
+          set -euo pipefail
+          mkdir -p /tmp/assay
+          gh release download "$ASSAY_VERSION" --repo Rul1an/assay \
+            --pattern "assay-mcp-server-$ASSAY_VERSION-x86_64-unknown-linux-gnu.tar.gz" --dir /tmp/assay
+          tar -xzf /tmp/assay/*.tar.gz -C /tmp/assay
+          BIN="$(find /tmp/assay -type f -name assay-mcp-server | head -1)"
+          chmod +x "$BIN"
+          echo "ASSAY=$BIN" >> "$GITHUB_ENV"
 
       - name: Run the agent gate
         run: ./scripts/run-gate.sh enforcement.sarif
