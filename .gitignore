@@ -1,0 +1,16 @@
+# Gate artifacts produced by a local run
+enforcement.sarif
+*.sarif
+decisions.ndjson
+
+# A local assay checkout if you build the binary inside the repo
+/assay-src/
+/target/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Editor / OS noise
+.DS_Store
+*.swp

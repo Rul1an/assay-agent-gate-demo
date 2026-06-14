@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Assay (the engine behind this demo)
+    url: https://github.com/Rul1an/assay/issues
+    about: Bugs or feature requests for assay itself belong here, not in the demo.
+  - name: Assay discussions
+    url: https://github.com/Rul1an/assay/discussions
+    about: Questions about policy-as-code for MCP agents, and general discussion.
