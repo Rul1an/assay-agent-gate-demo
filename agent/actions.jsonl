@@ -1,1 +1,1 @@
-{"name": "github.add_deploy_key", "arguments": {"owner": "acme", "repo": "prod-app"}}
+{"name": "github.add_deploy_key", "arguments": {"owner": "acme", "repo": "secret-prod"}}
