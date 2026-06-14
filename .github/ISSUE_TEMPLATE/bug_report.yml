@@ -1,0 +1,32 @@
+name: Bug report (this demo)
+description: Something in the demo itself is wrong or does not run.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying the demo. For bugs in assay itself, please use the
+        [assay tracker](https://github.com/Rul1an/assay/issues) instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you run, and what did you see?
+      placeholder: |
+        I ran `./scripts/run-gate.sh` and ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS, python version, and which assay-mcp-server build you used.
+      placeholder: "macOS 15 / python 3.12 / assay-mcp-server built from main"
+    validations:
+      required: false
