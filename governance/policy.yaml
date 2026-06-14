@@ -1,0 +1,11 @@
+# Approved governance for the agent. The agent may add deploy keys, but only on acme/prod-app, and
+# only with a credential carrying the scope that action requires. Anything outside this is denied.
+caller:
+  id: "ci-agent"
+upstream_credential:
+  alias: "gh-deploy"
+  scopes: ["repo:deploy_key:write"]
+allowances:
+  - action_class: "github_deploy_key"
+    targets:
+      - { owner: "acme", repo: "prod-app" }

@@ -1,0 +1,42 @@
+name: Agent privileged-action gate
+
+# On every PR: run the agent's actions through the enforcing proxy, project the decisions to SARIF,
+# upload them to the Security tab, and fail the PR if any privileged action was denied. The PR is
+# RED when an action is not declared, scoped, and approved; GREEN when every action passes.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write # required to upload SARIF to the Security tab
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+
+      - name: Install assay-mcp-server (latest release binary)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/assay
+          gh release download --repo Rul1an/assay \
+            --pattern 'assay-mcp-server-*-x86_64-unknown-linux-gnu.tar.gz' --dir /tmp/assay
+          tar -xzf /tmp/assay/*.tar.gz -C /tmp/assay
+          BIN="$(find /tmp/assay -type f -name assay-mcp-server | head -1)"
+          chmod +x "$BIN"
+          echo "ASSAY=$BIN" >> "$GITHUB_ENV"
+
+      - name: Run the agent gate
+        run: ./scripts/run-gate.sh enforcement.sarif
+
+      # Fork PRs run with a read-only token, so the Security-tab upload is skipped there; the deny
+      # gate above still fails the PR. Always upload (even on a deny) so the result is visible.
+      - name: Upload SARIF to the Security tab
+        if: ${{ always() && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: github/codeql-action/upload-sarif@439137e1b50c27ba9e2f9befc93e43091b449c34 # v3
+        with:
+          sarif_file: enforcement.sarif
